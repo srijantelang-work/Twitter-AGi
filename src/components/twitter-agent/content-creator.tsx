@@ -1,6 +1,6 @@
 'use client'
 
-import React, { useState, useEffect } from 'react'
+import React, { useState } from 'react'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -8,17 +8,17 @@ import { Textarea } from '@/components/ui/textarea'
 import { Label } from '@/components/ui/label'
 import { Badge } from '@/components/ui/badge'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
-import { Slider } from '@/components/ui/slider'
 import { Switch } from '@/components/ui/switch'
+import { AIResponse } from '@/types/ai'
 
 interface ContentSuggestion {
   suggestionId: number
   contentType: string
-  content: any
+  content: AIResponse
 }
 
 interface ContentCreatorProps {
-  onContentCreated?: (content: any) => void
+  onContentCreated?: (content: AIResponse) => void
   onClose?: () => void
 }
 
@@ -30,7 +30,7 @@ export default function ContentCreator({ onContentCreated, onClose }: ContentCre
   const [includeFollowUp, setIncludeFollowUp] = useState(false)
   const [suggestionLimit, setSuggestionLimit] = useState(3)
   const [suggestions, setSuggestions] = useState<ContentSuggestion[]>([])
-  const [selectedContent, setSelectedContent] = useState<any>(null)
+  const [selectedContent, setSelectedContent] = useState<AIResponse | null>(null)
   const [customContent, setCustomContent] = useState('')
   const [customHashtags, setCustomHashtags] = useState('')
   const [customEmojis, setCustomEmojis] = useState('')

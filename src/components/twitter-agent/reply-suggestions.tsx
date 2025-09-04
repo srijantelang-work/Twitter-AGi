@@ -5,16 +5,24 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 import { Copy, RefreshCw, CheckCircle, AlertCircle, Loader2 } from 'lucide-react'
-import { ReplySuggestion } from '@/lib/ai/reply-generator'
+import { ReplySuggestion, Tone } from '@/lib/ai/reply-generator'
 import { cn } from '@/lib/utils'
 
 interface ReplySuggestionsProps {
   suggestions: ReplySuggestion[]
-  tone: string
+  tone: Tone
   tweetId: string
   onRegenerate?: () => void
   isLoading?: boolean
   className?: string
+}
+
+const TONE_NAMES: Record<Tone, string> = {
+  HELPFUL: 'Helpful',
+  WITTY: 'Witty',
+  PLAYFUL: 'Playful',
+  CONFIDENT: 'Confident',
+  THOUGHTFUL: 'Thoughtful'
 }
 
 export function ReplySuggestions({
@@ -39,13 +47,13 @@ export function ReplySuggestions({
     }
   }
 
-  const getToneColor = (tone: string) => {
-    const toneColors: Record<string, string> = {
-      'Helpful': 'bg-blue-100 text-blue-800 border-blue-200',
-      'Witty': 'bg-purple-100 text-purple-800 border-purple-200',
-      'Playful': 'bg-pink-100 text-pink-800 border-pink-200',
-      'Confident': 'bg-green-100 text-green-800 border-green-200',
-      'Thoughtful': 'bg-indigo-100 text-indigo-800 border-indigo-200'
+  const getToneColor = (tone: Tone) => {
+    const toneColors: Record<Tone, string> = {
+      HELPFUL: 'bg-blue-100 text-blue-800 border-blue-200',
+      WITTY: 'bg-purple-100 text-purple-800 border-purple-200',
+      PLAYFUL: 'bg-pink-100 text-pink-800 border-pink-200',
+      CONFIDENT: 'bg-green-100 text-green-800 border-green-200',
+      THOUGHTFUL: 'bg-indigo-100 text-indigo-800 border-indigo-200'
     }
     return toneColors[tone] || 'bg-gray-100 text-gray-800 border-gray-200'
   }
@@ -58,9 +66,9 @@ export function ReplySuggestions({
 
   if (isLoading) {
     return (
-      <Card className={cn(className, "bg-white border-gray-200 shadow-sm")}>
+      <Card className={cn(className, "bg-white border-gray-200 shadow-sm font-satoshi")}>
         <CardHeader>
-          <CardTitle className="flex items-center gap-2 text-gray-900">
+          <CardTitle className="flex items-center gap-2 text-gray-900 font-satoshi-semibold">
             <Loader2 className="h-5 w-5 animate-spin text-cyan-600" />
             Generating Reply Suggestions...
           </CardTitle>
@@ -85,27 +93,27 @@ export function ReplySuggestions({
 
   if (!suggestions || suggestions.length === 0) {
     return (
-      <Card className={cn(className, "bg-white border-gray-200 shadow-sm")}>
+      <Card className={cn(className, "bg-white border-gray-200 shadow-sm font-satoshi")}>
         <CardContent className="p-6 text-center">
           <AlertCircle className="h-12 w-12 mx-auto mb-4 text-gray-400" />
-          <p className="text-gray-600">No reply suggestions available</p>
-          <p className="text-sm text-gray-500 mt-2">Try selecting a different tone or regenerating</p>
+          <p className="text-gray-600 font-satoshi-medium">No reply suggestions available</p>
+          <p className="text-sm text-gray-500 mt-2 font-satoshi-regular">Try selecting a different tone or regenerating</p>
         </CardContent>
       </Card>
     )
   }
 
   return (
-    <Card className={cn(className, "bg-white border-gray-200 shadow-sm")}>
+    <Card className={cn(className, "bg-white border-gray-200 shadow-sm font-satoshi")}>
       <CardHeader className="flex items-center justify-between">
-        <CardTitle className="flex items-center gap-2 text-gray-900">
+        <CardTitle className="flex items-center gap-2 text-gray-900 font-satoshi-semibold">
           <CheckCircle className="h-5 w-5 text-green-600" />
           AI Reply Suggestions
           <Badge 
             variant="outline" 
-            className={cn("ml-2", getToneColor(tone))}
+            className={cn("ml-2 font-satoshi-medium", getToneColor(tone))}
           >
-            {tone}
+            {TONE_NAMES[tone]}
           </Badge>
         </CardTitle>
         {onRegenerate && (
@@ -113,7 +121,7 @@ export function ReplySuggestions({
             size="sm" 
             variant="outline" 
             onClick={onRegenerate}
-            className="border-gray-200 text-gray-700 hover:bg-gray-50"
+            className="border-gray-200 text-gray-700 hover:bg-gray-50 font-satoshi-medium"
           >
             <RefreshCw className="mr-2 h-4 w-4" />
             Regenerate
@@ -121,7 +129,7 @@ export function ReplySuggestions({
         )}
       </CardHeader>
       <CardContent className="space-y-4">
-        <div className="text-xs text-gray-500 p-2 bg-gray-50 rounded border">
+        <div className="text-xs text-gray-500 p-2 bg-gray-50 rounded border font-satoshi-regular">
           <strong>Generated for:</strong> Tweet {tweetId.slice(-8)} • {suggestions.length} suggestions
         </div>
 
@@ -137,26 +145,26 @@ export function ReplySuggestions({
           >
             <div className="flex items-start justify-between gap-3">
               <div className="flex-1 space-y-3">
-                <p className="text-sm leading-relaxed text-gray-700">
+                <p className="text-sm leading-relaxed text-gray-700 font-satoshi-regular">
                   {suggestion.content}
                 </p>
                 
                 {suggestion.reasoning && (
-                  <p className="text-xs text-gray-500 italic">
+                  <p className="text-xs text-gray-500 italic font-satoshi-regular">
                     💡 {suggestion.reasoning}
                   </p>
                 )}
 
                 <div className="flex items-center gap-3">
                   <span className={cn(
-                    "text-xs font-mono",
+                    "text-xs font-mono font-satoshi-medium",
                     getCharacterCountColor(suggestion.characterCount)
                   )}>
                     {suggestion.characterCount}/280 chars
                   </span>
                   
                   {!suggestion.isAppropriate && (
-                    <Badge variant="destructive" className="text-xs">
+                    <Badge variant="destructive" className="text-xs font-satoshi-medium">
                       Inappropriate
                     </Badge>
                   )}
@@ -168,7 +176,7 @@ export function ReplySuggestions({
                 variant="outline"
                 onClick={() => handleCopy(suggestion.content, index)}
                 className={cn(
-                  "border-gray-200 text-gray-700 hover:bg-gray-100 transition-all",
+                  "border-gray-200 text-gray-700 hover:bg-gray-100 transition-all font-satoshi-medium",
                   copiedIndex === index && "border-green-500 text-green-700 bg-green-50"
                 )}
               >
@@ -188,7 +196,7 @@ export function ReplySuggestions({
           </div>
         ))}
 
-        <div className="text-xs text-gray-500 p-3 bg-blue-50 rounded border border-blue-200">
+        <div className="text-xs text-gray-500 p-3 bg-blue-50 rounded border border-blue-200 font-satoshi-regular">
           <strong>💡 Tip:</strong> Click &quot;Copy&quot; to copy any suggestion to your clipboard. 
           You can then paste it directly into Twitter or modify it as needed.
         </div>

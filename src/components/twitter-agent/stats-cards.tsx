@@ -2,7 +2,8 @@
 
 import type React from "react"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { TrendingUp, MessageSquareText, UserPlus, Clock, AlertCircle } from "lucide-react"
+import { Button } from "@/components/ui/button"
+import { TrendingUp, MessageSquareText, UserPlus, Clock, AlertCircle, RefreshCw, Loader2 } from "lucide-react"
 import { Area, AreaChart, ResponsiveContainer, Tooltip, XAxis, YAxis } from "recharts"
 import { cn } from "@/lib/utils"
 import { useDashboardData } from "@/contexts/DashboardDataContext"
@@ -59,6 +60,39 @@ export function StatsCards({ className }: { className?: string }) {
 
   return (
     <section aria-label="Overview statistics" className={cn("grid gap-4 sm:grid-cols-2 lg:grid-cols-4", className)}>
+      {/* Stats Header with Refresh Controls */}
+      <Card className="col-span-full lg:col-span-4">
+        <CardHeader className="pb-2">
+          <div className="flex items-center justify-between">
+            <CardTitle className="text-sm">Overview Statistics</CardTitle>
+            <div className="flex items-center gap-3">
+              <div className="text-xs text-muted-foreground">
+                Realtime: {realtime.isConnected ? "🟢 Connected" : "🔴 Disconnected"}
+              </div>
+              <Button 
+                onClick={stats.refresh} 
+                disabled={stats.loading}
+                variant="outline"
+                size="sm"
+                className="flex items-center gap-2"
+              >
+                {stats.loading ? (
+                  <>
+                    <Loader2 className="h-4 w-4 animate-spin" />
+                    Updating...
+                  </>
+                ) : (
+                  <>
+                    <RefreshCw className="h-4 w-4" />
+                    Update Stats
+                  </>
+                )}
+              </Button>
+            </div>
+          </div>
+        </CardHeader>
+      </Card>
+
       <KPI 
         title="Intent Mentions" 
         value={stats.data?.totalTweets?.toString() || "0"} 
@@ -86,9 +120,6 @@ export function StatsCards({ className }: { className?: string }) {
       <Card className="col-span-full lg:col-span-4">
         <CardHeader className="pb-2">
           <CardTitle className="text-sm">Engagement Trend</CardTitle>
-          <div className="flex items-center gap-2 text-xs text-muted-foreground">
-            <span>Realtime: {realtime.isConnected ? "🟢 Connected" : "🔴 Disconnected"}</span>
-          </div>
         </CardHeader>
         <CardContent className="h-36">
           <ResponsiveContainer width="100%" height="100%">
