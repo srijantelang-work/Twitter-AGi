@@ -6,7 +6,6 @@ import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 import { Label } from '@/components/ui/label'
 import { Textarea } from '@/components/ui/textarea'
-import { Switch } from '@/components/ui/switch'
 import { useAuth } from '@/contexts/AuthContext'
 import { Loader2, Sparkles, FileText } from 'lucide-react'
 
@@ -25,12 +24,9 @@ export default function SimpleContentGenerator() {
   const { user } = useAuth()
   const [contentType, setContentType] = useState('varied')
   const [context, setContext] = useState('')
-  const [includeEngagementPrompt, setIncludeEngagementPrompt] = useState(true)
-  const [includeFollowUp, setIncludeFollowUp] = useState(false)
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [generatedContents, setGeneratedContents] = useState<GeneratedContent[]>([])
-  const [selectedContent, setSelectedContent] = useState<GeneratedContent | null>(null)
 
   const generateContent = async () => {
     if (!user) {
@@ -49,8 +45,6 @@ export default function SimpleContentGenerator() {
         body: JSON.stringify({
           contentType,
           context: context || `Generate ${contentType} content for the AI Superconnector brand`,
-          includeEngagementPrompt,
-          includeFollowUp
         })
       })
 
@@ -73,7 +67,6 @@ export default function SimpleContentGenerator() {
         }
         
         setGeneratedContents(prev => [newContent, ...prev])
-        setSelectedContent(newContent)
         setError(null)
         
         // Clear form
@@ -86,26 +79,6 @@ export default function SimpleContentGenerator() {
       setError(error instanceof Error ? error.message : 'Failed to generate content')
     } finally {
       setLoading(false)
-    }
-  }
-
-  const updateContentStatus = (id: string, status: 'draft' | 'approved' | 'scheduled') => {
-    setGeneratedContents(prev => 
-      prev.map(content => 
-        content.id === id ? { ...content, status } : content
-      )
-    )
-    
-    if (selectedContent?.id === id) {
-      setSelectedContent(prev => prev ? { ...prev, status } : null)
-    }
-  }
-
-  const deleteContent = (id: string) => {
-    setGeneratedContents(prev => prev.filter(content => content.id !== id))
-    
-    if (selectedContent?.id === id) {
-      setSelectedContent(null)
     }
   }
 
@@ -125,7 +98,7 @@ export default function SimpleContentGenerator() {
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h2 className="text-2xl font-semibold text-gray-900">AI Content Generator</h2>
+          <h2 className="text-2xl font-semibold text-gray-900">Shitposting</h2>
           <p className="text-gray-600 mt-2">
             Generate AI-powered content for your brand - Simple, Fast, Effective
           </p>
@@ -145,14 +118,7 @@ export default function SimpleContentGenerator() {
                 <p className="font-medium">Error</p>
                 <p className="text-sm text-red-600">{error}</p>
               </div>
-              <Button 
-                onClick={() => setError(null)} 
-                variant="outline" 
-                size="sm"
-                className="ml-auto border-red-200 text-red-700 hover:bg-red-100"
-              >
-                Dismiss
-              </Button>
+              {/* Removed Dismiss button */}
             </div>
           </CardContent>
         </Card>
@@ -202,39 +168,11 @@ export default function SimpleContentGenerator() {
                 />
               </div>
 
-              {/* Options */}
-              <div className="space-y-4">
-                <div className="flex items-center justify-between p-3 bg-gray-50 rounded-lg border border-gray-200">
-                  <div className="flex items-center gap-3">
-                    <div className="w-3 h-3 bg-cyan-600 rounded-full"></div>
-                    <Label htmlFor="engagementPrompt" className="text-sm font-medium text-gray-700">Include engagement prompt</Label>
-                  </div>
-                  <Switch
-                    id="engagementPrompt"
-                    checked={includeEngagementPrompt}
-                    onCheckedChange={setIncludeEngagementPrompt}
-                    className="data-[state=checked]:bg-cyan-600 data-[state=unchecked]:bg-gray-300 h-7 w-14"
-                  />
-                </div>
-                <div className="flex items-center justify-between p-3 bg-gray-50 rounded-lg border border-gray-200">
-                  <div className="flex items-center gap-3">
-                    <div className="w-3 h-3 bg-cyan-600 rounded-full"></div>
-                    <Label htmlFor="followUp" className="text-sm font-medium text-gray-700">Include follow-up content</Label>
-                  </div>
-                  <Switch
-                    id="followUp"
-                    checked={includeFollowUp}
-                    onCheckedChange={setIncludeFollowUp}
-                    className="data-[state=checked]:bg-cyan-600 data-[state=unchecked]:bg-gray-300 h-7 w-14"
-                  />
-                </div>
-              </div>
-
               {/* Generate Button */}
               <Button 
                 onClick={generateContent} 
                 disabled={loading}
-                className="w-full bg-cyan-600 hover:bg-cyan-700 text-white"
+                className="w-full bg-cyan-600 hover:bg-cyan-700 text-white p-2 rounded-md"
               >
                 {loading ? (
                   <>
@@ -301,32 +239,7 @@ export default function SimpleContentGenerator() {
                             </p>
                           )}
                         </div>
-                        <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2 flex-shrink-0">
-                          <Button 
-                            size="sm" 
-                            variant="outline"
-                            onClick={() => setSelectedContent(item)}
-                            className="w-full sm:w-auto"
-                          >
-                            View
-                          </Button>
-                          <Button 
-                            size="sm" 
-                            variant="outline"
-                            onClick={() => updateContentStatus(item.id, 'approved')}
-                            className={`w-full sm:w-auto ${item.status === 'approved' ? 'bg-green-100 border-green-300' : ''}`}
-                          >
-                            Approve
-                          </Button>
-                          <Button 
-                            size="sm" 
-                            variant="outline"
-                            onClick={() => deleteContent(item.id)}
-                            className="w-full sm:w-auto text-red-600 border-red-200 hover:bg-red-50"
-                          >
-                            Delete
-                          </Button>
-                        </div>
+                        {/* Removed View button */}
                       </div>
                     </div>
                   ))}
@@ -341,68 +254,6 @@ export default function SimpleContentGenerator() {
           </Card>
         </div>
       </div>
-
-      {/* Content Preview Modal */}
-      {selectedContent && (
-        <Card className="border border-gray-200 shadow-lg">
-          <CardHeader>
-            <div className="flex items-center justify-between">
-              <CardTitle className="text-lg font-semibold text-gray-900">Content Preview</CardTitle>
-              <Button 
-                variant="outline" 
-                size="sm"
-                onClick={() => setSelectedContent(null)}
-              >
-                Close
-              </Button>
-            </div>
-          </CardHeader>
-          <CardContent>
-            <div className="space-y-4">
-              <div className="p-4 border border-gray-200 rounded-lg bg-gray-50">
-                <h4 className="font-medium text-gray-900 mb-2">Generated Content:</h4>
-                <p className="text-sm text-gray-700 mb-3 whitespace-pre-wrap">{selectedContent.content}</p>
-                <div className="flex items-center space-x-2 text-xs text-gray-600">
-                  {selectedContent.hashtags?.map((tag: string, index: number) => (
-                    <Badge key={index} variant="secondary" className="bg-gray-200 text-gray-700">
-                      #{tag}
-                    </Badge>
-                  ))}
-                  {selectedContent.emojis?.map((emoji: string, index: number) => (
-                    <span key={index}>{emoji}</span>
-                  ))}
-                </div>
-              </div>
-
-              <div className="flex items-center space-x-3">
-                <Button 
-                  className="bg-cyan-600 hover:bg-cyan-700 text-white"
-                  onClick={() => updateContentStatus(selectedContent.id, 'approved')}
-                >
-                  Approve Content
-                </Button>
-                <Button 
-                  variant="outline"
-                  className="border-gray-200 text-gray-700 hover:bg-gray-50"
-                  onClick={() => updateContentStatus(selectedContent.id, 'scheduled')}
-                >
-                  Mark as Scheduled
-                </Button>
-                <Button 
-                  variant="outline"
-                  className="border-red-200 text-red-700 hover:bg-red-50"
-                  onClick={() => {
-                    deleteContent(selectedContent.id)
-                    setSelectedContent(null)
-                  }}
-                >
-                  Delete
-                </Button>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-      )}
     </div>
   )
 }
