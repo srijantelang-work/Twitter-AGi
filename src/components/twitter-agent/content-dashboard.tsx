@@ -208,11 +208,8 @@ export default function ContentDashboard() {
                 >
                   <option value="varied">🎲 Varied Content</option>
                   <option value="networking_tips">🤝 Networking Tips</option>
-                  <option value="ai_insights">🧠 AI Insights</option>
-                  <option value="startup_humor">😄 Startup Humor</option>
-                  <option value="community_building">👥 Community Building</option>
-                  <option value="connection_stories">📖 Connection Stories</option>
-                  <option value="tech_trends">🚀 Tech Trends</option>
+                  <option value="ai_insights">🧠 AI Superconnector</option>
+                  <option value="startup_humor">😄 Founder Humor</option>
                 </select>
               </div>
 
