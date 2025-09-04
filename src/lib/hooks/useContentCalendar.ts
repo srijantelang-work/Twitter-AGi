@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from 'react'
+import { useState, useEffect, useCallback, useMemo } from 'react'
 import { ContentCalendarSystem, ContentCalendarEvent, OptimalPostingTime, ContentSchedule } from '@/lib/content/calendar-system'
 
 interface UseContentCalendarOptions {
@@ -41,7 +41,7 @@ export function useContentCalendar({
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
 
-  const calendarSystem = new ContentCalendarSystem()
+  const calendarSystem = useMemo(() => new ContentCalendarSystem(), [])
 
   const fetchCalendarData = useCallback(async () => {
     try {

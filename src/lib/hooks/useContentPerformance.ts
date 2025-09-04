@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from 'react'
+import { useState, useEffect, useCallback, useMemo } from 'react'
 import { ContentAnalyticsService, ContentPerformanceMetrics, ContentAnalytics, PerformanceInsight } from '@/lib/analytics/content-analytics'
 
 interface UseContentPerformanceOptions {
@@ -30,7 +30,7 @@ export function useContentPerformance({
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
 
-  const analyticsService = new ContentAnalyticsService()
+  const analyticsService = useMemo(() => new ContentAnalyticsService(), [])
 
   const fetchAnalytics = useCallback(async () => {
     try {
