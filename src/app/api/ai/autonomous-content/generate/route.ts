@@ -1,5 +1,4 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { GroqService } from '@/lib/ai/groq-service'
 import { ContentVarietyEngine } from '@/lib/ai/content-variety-engine'
 import { systemLogger } from '@/lib/logging/system-logger'
 import { getSuperconnectorConfig } from '@/lib/config/ai-config'
@@ -7,7 +6,7 @@ import { getSuperconnectorConfig } from '@/lib/config/ai-config'
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json()
-    const { contentType, context, includeEngagementPrompt, includeFollowUp } = body
+    const { contentType, context } = body
 
     if (!contentType) {
       return NextResponse.json(
@@ -21,10 +20,7 @@ export async function POST(request: NextRequest) {
       'varied',
       'networking_tips',
       'ai_insights', 
-      'startup_humor',
-      'community_building',
-      'connection_stories',
-      'tech_trends'
+      'startup_humor'
     ]
 
     if (!validContentTypes.includes(contentType)) {
@@ -34,7 +30,7 @@ export async function POST(request: NextRequest) {
       )
     }
 
-    // Check if Groq API is configured
+    // Check if AI Superconnector configuration is available
     try {
       getSuperconnectorConfig()
     } catch {
@@ -44,7 +40,6 @@ export async function POST(request: NextRequest) {
       )
     }
 
-    const groqService = new GroqService()
     const varietyEngine = new ContentVarietyEngine()
 
     let content
@@ -54,13 +49,8 @@ export async function POST(request: NextRequest) {
       // Use variety engine for diverse content
       content = await varietyEngine.generateVariedContent()
     } else {
-      // Generate specific content type
-      content = await groqService.generateSuperconnectorContent({
-        contentType: contentType as 'networking_tips' | 'ai_insights' | 'startup_humor' | 'community_building' | 'connection_stories' | 'tech_trends',
-        context: context || `Generate ${contentType} content for the AI Superconnector brand`,
-        includeEngagementPrompt: includeEngagementPrompt || false,
-        includeFollowUp: includeFollowUp || false
-      })
+      // Use the appropriate content generator for specific types
+      content = await varietyEngine.generateContentByType(contentType)
     }
 
     await systemLogger.info('AI API', 'Content generated successfully', {
@@ -109,20 +99,15 @@ export async function GET(request: NextRequest) {
       )
     }
 
-    const groqService = new GroqService()
     const varietyEngine = new ContentVarietyEngine()
 
     const suggestions = []
 
     if (contentType && contentType !== 'varied') {
-      // Generate specific content type
+      // Generate specific content type using content generators
       for (let i = 0; i < limit; i++) {
         try {
-          const content = await groqService.generateSuperconnectorContent({
-            contentType: contentType as 'networking_tips' | 'ai_insights' | 'startup_humor' | 'community_building' | 'connection_stories' | 'tech_trends',
-            context: `Content suggestion ${i + 1} for ${contentType}`,
-            includeEngagementPrompt: true
-          })
+          const content = await varietyEngine.generateContentByType(contentType)
           
           suggestions.push({
             suggestionId: i + 1,

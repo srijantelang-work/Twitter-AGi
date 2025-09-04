@@ -330,9 +330,6 @@ export function LiveFeed({ className, selectedTone = 'HELPFUL' }: LiveFeedProps)
                   </div>
                   <div className="text-right">
                     <time className="text-xs text-gray-500">{item.minutesAgo}m</time>
-                    {item.engagement > 0 && (
-                      <div className="text-xs text-gray-400">❤️ {item.engagement}</div>
-                    )}
                   </div>
                 </header>
                 <p className="text-sm leading-relaxed text-gray-700 mb-3">{item.text}</p>
@@ -373,7 +370,6 @@ export function LiveFeed({ className, selectedTone = 'HELPFUL' }: LiveFeedProps)
                 <ReplySuggestions
                   suggestions={replySuggestions[item.id] || []}
                   tone={selectedTone}
-                  tweetId={item.id}
                   onRegenerate={() => handleRegenerateReplies(item.id)}
                   isLoading={generatingReplies[item.id]}
                   className="ml-4 w-full"

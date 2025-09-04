@@ -11,7 +11,6 @@ import { cn } from '@/lib/utils'
 interface ReplySuggestionsProps {
   suggestions: ReplySuggestion[]
   tone: Tone
-  tweetId: string
   onRegenerate?: () => void
   isLoading?: boolean
   className?: string
@@ -28,7 +27,6 @@ const TONE_NAMES: Record<Tone, string> = {
 export function ReplySuggestions({
   suggestions,
   tone,
-  tweetId,
   onRegenerate,
   isLoading = false,
   className
@@ -58,11 +56,7 @@ export function ReplySuggestions({
     return toneColors[tone] || 'bg-gray-100 text-gray-800 border-gray-200'
   }
 
-  const getCharacterCountColor = (count: number) => {
-    if (count <= 200) return 'text-green-600'
-    if (count <= 250) return 'text-yellow-600'
-    return 'text-red-600'
-  }
+
 
   if (isLoading) {
     return (
@@ -129,10 +123,6 @@ export function ReplySuggestions({
         )}
       </CardHeader>
       <CardContent className="space-y-4">
-        <div className="text-xs text-gray-500 p-2 bg-gray-50 rounded border font-satoshi-regular">
-          <strong>Generated for:</strong> Tweet {tweetId.slice(-8)} • {suggestions.length} suggestions
-        </div>
-
         {suggestions.map((suggestion, index) => (
           <div 
             key={index} 
@@ -155,20 +145,13 @@ export function ReplySuggestions({
                   </p>
                 )}
 
-                <div className="flex items-center gap-3">
-                  <span className={cn(
-                    "text-xs font-mono font-satoshi-medium",
-                    getCharacterCountColor(suggestion.characterCount)
-                  )}>
-                    {suggestion.characterCount}/280 chars
-                  </span>
-                  
-                  {!suggestion.isAppropriate && (
+                {!suggestion.isAppropriate && (
+                  <div className="flex items-center gap-3">
                     <Badge variant="destructive" className="text-xs font-satoshi-medium">
                       Inappropriate
                     </Badge>
-                  )}
-                </div>
+                  </div>
+                )}
               </div>
 
               <Button

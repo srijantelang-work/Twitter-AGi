@@ -37,7 +37,7 @@ export interface ContentGenerationRequest {
 }
 
 export interface SuperconnectorContentRequest {
-  contentType: 'networking_tips' | 'ai_insights' | 'startup_humor' | 'community_building' | 'connection_stories' | 'tech_trends'
+  contentType: 'networking_tips' | 'ai_insights' | 'startup_humor'
   context?: string
   includeEngagementPrompt?: boolean
   includeFollowUp?: boolean

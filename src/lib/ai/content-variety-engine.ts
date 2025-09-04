@@ -31,16 +31,6 @@ export interface ContentVarietyMetrics {
   lastContentTypes: string[]
 }
 
-export interface CommunityBuildingContentPiece {
-  content: string
-  hashtags: string[]
-  emojis: string[]
-  engagementPrompt: string
-  contentType: 'community_building'
-  confidence: number
-  reasoning: string
-}
-
 export class ContentVarietyEngine {
   private config = getSuperconnectorConfig()
   private networkingGenerator = new NetworkingContentGenerator()
@@ -50,10 +40,9 @@ export class ContentVarietyEngine {
   private varietyConfig: ContentVarietyConfig = {
     maxConsecutiveSimilarContent: 2,
     contentTypeWeights: {
-      networking_tips: 0.3,
-      ai_insights: 0.25,
-      startup_humor: 0.25,
-      community_building: 0.2
+      networking_tips: 0.4,
+      ai_insights: 0.3,
+      startup_humor: 0.3
     },
     hashtagVariety: true,
     emojiVariety: true,
@@ -71,7 +60,7 @@ export class ContentVarietyEngine {
   /**
    * Generate content with variety optimization
    */
-  async generateVariedContent(): Promise<NetworkingContentPiece | AIInsightContentPiece | StartupHumorContentPiece | CommunityBuildingContentPiece> {
+  async generateVariedContent(): Promise<NetworkingContentPiece | AIInsightContentPiece | StartupHumorContentPiece> {
     try {
       // Analyze recent content to determine optimal next content type
       const optimalContentType = this.determineOptimalContentType()
@@ -142,7 +131,7 @@ export class ContentVarietyEngine {
   /**
    * Generate content by specific type
    */
-  private async generateContentByType(contentType: string): Promise<NetworkingContentPiece | AIInsightContentPiece | StartupHumorContentPiece | CommunityBuildingContentPiece> {
+  async generateContentByType(contentType: string): Promise<NetworkingContentPiece | AIInsightContentPiece | StartupHumorContentPiece> {
     switch (contentType) {
       case 'networking_tips':
         return await this.networkingGenerator.generateRandomNetworkingContent()
@@ -153,51 +142,10 @@ export class ContentVarietyEngine {
       case 'startup_humor':
         return await this.startupHumorGenerator.generateRandomStartupHumor()
       
-      case 'community_building':
-        return await this.generateCommunityBuildingContent()
-      
       default:
         // Fallback to networking content
         return await this.networkingGenerator.generateRandomNetworkingContent()
     }
-  }
-
-  /**
-   * Generate community building content
-   */
-  private async generateCommunityBuildingContent(): Promise<CommunityBuildingContentPiece> {
-    const communityContent = [
-      {
-        content: "Communities don't build themselves. The secret? Start with 5 passionate people, give them ownership, and watch it grow organically.",
-        hashtags: ["#CommunityBuilding", "#Ownership", "#OrganicGrowth"],
-        emojis: ["👥", "🌱"],
-        engagementPrompt: "What's your community building secret?",
-        contentType: 'community_building' as const,
-        confidence: 0.92,
-        reasoning: "Provides actionable community building strategy"
-      },
-      {
-        content: "The best communities are built on shared values, not shared interests. Values create bonds, interests create conversations.",
-        hashtags: ["#CommunityValues", "#SharedValues", "#CommunityBonds"],
-        emojis: ["💎", "🔗"],
-        engagementPrompt: "What values drive your community?",
-        contentType: 'community_building' as const,
-        confidence: 0.90,
-        reasoning: "Distinguishes between values and interests in community building"
-      },
-      {
-        content: "Community engagement hack: Ask questions that make people think, not just answer. 'What if...' beats 'What do you think...' every time.",
-        hashtags: ["#CommunityEngagement", "#EngagementHacks", "#BetterQuestions"],
-        emojis: ["💡", "❓"],
-        engagementPrompt: "What's your best engagement question?",
-        contentType: 'community_building' as const,
-        confidence: 0.88,
-        reasoning: "Provides specific engagement strategy with examples"
-      }
-    ]
-
-    const content = communityContent[Math.floor(Math.random() * communityContent.length)]
-    return content
   }
 
   /**
@@ -210,7 +158,7 @@ export class ContentVarietyEngine {
   /**
    * Update metrics with new content
    */
-  private updateMetrics(content: NetworkingContentPiece | AIInsightContentPiece | StartupHumorContentPiece | CommunityBuildingContentPiece): void {
+  private updateMetrics(content: NetworkingContentPiece | AIInsightContentPiece | StartupHumorContentPiece): void {
     const contentType = content.contentType || 'unknown'
     
     // Update content type distribution
@@ -258,7 +206,7 @@ export class ContentVarietyEngine {
   /**
    * Validate content variety
    */
-  private async validateContentVariety(content: NetworkingContentPiece | AIInsightContentPiece | StartupHumorContentPiece | CommunityBuildingContentPiece): Promise<void> {
+  private async validateContentVariety(content: NetworkingContentPiece | AIInsightContentPiece | StartupHumorContentPiece): Promise<void> {
     const recentTypes = this.metrics.lastContentTypes.slice(-this.varietyConfig.maxConsecutiveSimilarContent)
     const contentType = content.contentType || 'unknown'
     

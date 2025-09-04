@@ -102,11 +102,7 @@ export const AI_CONFIG = {
     contentThemes: [
       'networking_tips',
       'ai_insights', 
-      'startup_ecosystem',
-      'community_building',
-      'founder_humor',
-      'tech_trends',
-      'connection_stories'
+      'startup_humor'
     ],
     
     postingSchedule: {

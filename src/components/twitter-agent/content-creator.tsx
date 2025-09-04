@@ -42,11 +42,8 @@ export default function ContentCreator({ onContentCreated, onClose }: ContentCre
   const contentTypes = [
     { value: 'varied', label: 'Varied Content', icon: '🎲', description: 'AI-generated diverse content mix' },
     { value: 'networking_tips', label: 'Networking Tips', icon: '🤝', description: 'Professional networking advice and strategies' },
-    { value: 'ai_insights', label: 'AI Insights', icon: '🧠', description: 'AI trends and industry insights' },
-    { value: 'startup_humor', label: 'Startup Humor', icon: '😄', description: 'Founder-friendly humor and memes' },
-    { value: 'community_building', label: 'Community Building', icon: '👥', description: 'Strategies for building communities' },
-    { value: 'connection_stories', label: 'Connection Stories', icon: '📖', description: 'Success stories and case studies' },
-    { value: 'tech_trends', label: 'Tech Trends', icon: '🚀', description: 'Emerging technology trends' }
+    { value: 'ai_insights', label: 'AI Superconnector', icon: '🧠', description: 'AI superconnector concept and value' },
+    { value: 'startup_humor', label: 'Founder Humor', icon: '😄', description: 'Founder-friendly humor and tech memes' }
   ]
 
   const timeSlots = [
