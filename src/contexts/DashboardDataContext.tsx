@@ -36,6 +36,7 @@ interface DashboardDataContextType {
     data: TweetData[];
     loading: boolean;
     error: string | null;
+    lastRefresh: Date | null; // Add lastRefresh timestamp
     refresh: () => void;
     addTweet: (tweet: Partial<TweetData>) => Promise<void>;
     updateTweet: (id: string, updates: Partial<TweetData>) => Promise<void>;
@@ -88,6 +89,7 @@ export function DashboardDataProvider({ children }: { children: ReactNode }) {
       data: tweets.tweets,
       loading: tweets.loading,
       error: tweets.error,
+      lastRefresh: tweets.lastRefresh,
       refresh: tweets.refresh,
       addTweet: tweets.addTweet,
       updateTweet: tweets.updateTweet,

@@ -99,6 +99,13 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
             log('Error initializing user profile', error)
           }
         }
+        
+        // Handle sign out event
+        if (event === 'SIGNED_OUT') {
+          log('User signed out, redirecting to landing page')
+          // Redirect to landing page when user signs out
+          window.location.href = '/'
+        }
       }
     )
 
@@ -113,7 +120,12 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       const redirectUrl = getOAuthRedirectUrl(provider)
       log('Using redirect URL:', redirectUrl)
       
-      const options: any = {
+      const options: {
+        redirectTo: string
+        queryParams?: {
+          scope: string
+        }
+      } = {
         redirectTo: redirectUrl
       }
       
@@ -146,6 +158,9 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       const { error } = await supabase.auth.signOut()
       if (error) throw error
       log('Sign out successful')
+      
+      // Redirect to landing page after successful sign out
+      window.location.href = '/'
     } catch (error) {
       console.error('Error signing out:', error)
       throw error
