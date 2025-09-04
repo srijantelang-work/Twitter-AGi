@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback } from 'react'
-import { ContentCalendarSystem, ContentCalendarEvent, OptimalPostingTime } from '@/lib/content/calendar-system'
+import { ContentCalendarSystem, ContentCalendarEvent, OptimalPostingTime, ContentSchedule } from '@/lib/content/calendar-system'
 
 interface UseContentCalendarOptions {
   userId: string
@@ -11,7 +11,7 @@ interface UseContentCalendarOptions {
 interface UseContentCalendarReturn {
   scheduledContent: ContentCalendarEvent[]
   optimalTimes: OptimalPostingTime[]
-  varietyDistribution: any
+  varietyDistribution: Record<string, number> | null
   loading: boolean
   error: string | null
   refresh: () => Promise<void>
@@ -20,7 +20,7 @@ interface UseContentCalendarReturn {
     scheduledAt: Date,
     postingTimeSlot: string,
     timezone?: string
-  ) => Promise<any>
+  ) => Promise<ContentSchedule>
   updateScheduleStatus: (
     scheduleId: string,
     status: string,
@@ -37,7 +37,7 @@ export function useContentCalendar({
 }: UseContentCalendarOptions): UseContentCalendarReturn {
   const [scheduledContent, setScheduledContent] = useState<ContentCalendarEvent[]>([])
   const [optimalTimes, setOptimalTimes] = useState<OptimalPostingTime[]>([])
-  const [varietyDistribution, setVarietyDistribution] = useState<any>(null)
+  const [varietyDistribution, setVarietyDistribution] = useState<Record<string, number> | null>(null)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
 
@@ -54,16 +54,16 @@ export function useContentCalendar({
       ])
 
       // Map ContentSchedule to ContentCalendarEvent
-      const mappedContent = contentData.map((item: any) => ({
+      const mappedContent = contentData.map((item: ContentSchedule) => ({
         id: item.id,
-        contentId: item.content_id,
-        userId: item.user_id,
-        scheduledAt: new Date(item.scheduled_at),
-        postingTimeSlot: item.posting_time_slot,
+        contentId: item.contentId,
+        userId: item.userId,
+        scheduledAt: item.scheduledAt,
+        postingTimeSlot: item.postingTimeSlot,
         timezone: item.timezone,
-        status: item.status,
-        errorMessage: item.error_message,
-        retryCount: item.retry_count,
+        status: item.status as 'scheduled' | 'queued' | 'posting' | 'posted' | 'failed' | 'cancelled',
+        errorMessage: item.errorMessage,
+        retryCount: item.retryCount,
         contentType: 'mixed', // Default value
         priority: 'medium' as const // Default value
       }))

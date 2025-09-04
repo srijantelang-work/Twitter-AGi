@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 
 interface TwitterTweetData {
   id: string;
@@ -46,6 +46,7 @@ interface UseTwitterSearchReturn {
   addTweet: (tweet: Partial<TweetData>) => Promise<void>;
   updateTweet: (id: string, updates: Partial<TweetData>) => Promise<void>;
   deleteTweet: (id: string) => Promise<void>;
+  lastRefresh: Date | null;
 }
 
 // Transform Twitter API response to TweetData format
@@ -74,10 +75,11 @@ const transformTwitterTweetsToTweetData = (
 
 export function useTwitterSearch(): UseTwitterSearchReturn {
   const [tweets, setTweets] = useState<TweetData[]>([]);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(false); // Changed from true to false
   const [error, setError] = useState<string | null>(null);
+  const [lastRefresh, setLastRefresh] = useState<Date | null>(null); // Add last refresh timestamp
 
-  console.log('🔍 useTwitterSearch hook state:', { tweets, loading, error })
+  console.log('🔍 useTwitterSearch hook state:', { tweets, loading, error, lastRefresh })
 
   const fetchTweets = async () => {
     console.log('📡 useTwitterSearch fetchTweets called')
@@ -128,6 +130,7 @@ export function useTwitterSearch(): UseTwitterSearchReturn {
       
       console.log('✅ useTwitterSearch setting tweets state to:', tweetData)
       setTweets(tweetData);
+      setLastRefresh(new Date()); // Update last refresh timestamp
       setError(null); // Clear any previous errors
     } catch (err) {
       console.error('❌ useTwitterSearch fetchTweets error:', err)
@@ -159,17 +162,19 @@ export function useTwitterSearch(): UseTwitterSearchReturn {
     await fetchTweets();
   };
 
-  useEffect(() => {
-    console.log('🔄 useTwitterSearch useEffect triggered, calling fetchTweets')
-    fetchTweets();
-  }, []);
+  // Remove automatic fetch on mount - users must manually refresh
+  // useEffect(() => {
+  //   console.log('🔄 useTwitterSearch useEffect triggered, calling fetchTweets')
+  //   fetchTweets();
+  // }, []);
 
-  console.log('🔍 useTwitterSearch hook returning:', { tweets, loading, error, refresh: fetchTweets, addTweet, updateTweet, deleteTweet })
+  console.log('🔍 useTwitterSearch hook returning:', { tweets, loading, error, lastRefresh, refresh: fetchTweets, addTweet, updateTweet, deleteTweet })
 
   return {
     tweets,
     loading,
     error,
+    lastRefresh, // Add lastRefresh to return object
     refresh: fetchTweets,
     addTweet,
     updateTweet,

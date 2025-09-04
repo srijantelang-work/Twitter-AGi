@@ -1,4 +1,4 @@
-interface RateLimitInfo {
+export interface RateLimitInfo {
   endpoint: string
   remaining: number
   resetTime: number

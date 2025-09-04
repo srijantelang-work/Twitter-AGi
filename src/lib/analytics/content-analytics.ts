@@ -35,7 +35,28 @@ export interface PerformanceInsight {
   description: string
   recommendation: string
   confidence: number
-  metrics: any
+  metrics: Record<string, string | number | [string, number][]>
+}
+
+interface DatabasePerformanceData {
+  content_id: string
+  engagement_rate: number
+  performance_score: number
+  likes_count?: number
+  retweets_count?: number
+  replies_count?: number
+  impressions?: number
+  tracked_at: string
+  ai_superconnector_content?: {
+    content_type: string
+    hashtags: string[]
+    scheduled_at: string
+  }
+}
+
+interface DatabaseContentData {
+  hashtags: string[]
+  created_at: string
 }
 
 export class ContentAnalyticsService {
@@ -208,7 +229,7 @@ export class ContentAnalyticsService {
   /**
    * Calculate analytics from raw data
    */
-  private calculateAnalytics(performanceData: any[], contentData: any[]): ContentAnalytics {
+  private calculateAnalytics(performanceData: DatabasePerformanceData[], contentData: DatabaseContentData[]): ContentAnalytics {
     const analytics: ContentAnalytics = {
       totalContent: contentData.length,
       averageEngagementRate: 0,
@@ -314,7 +335,7 @@ export class ContentAnalyticsService {
   /**
    * Extract trending topics from content
    */
-  private extractTrendingTopics(contentData: any[]): string[] {
+  private extractTrendingTopics(contentData: DatabaseContentData[]): string[] {
     const hashtagCounts: Record<string, number> = {}
     
     contentData.forEach(item => {
@@ -402,7 +423,7 @@ export class ContentAnalyticsService {
   /**
    * Map database data to ContentPerformanceMetrics interface
    */
-  private mapPerformanceMetrics(data: any): ContentPerformanceMetrics {
+  private mapPerformanceMetrics(data: DatabasePerformanceData): ContentPerformanceMetrics {
     return {
       contentId: data.content_id,
       likesCount: data.likes_count || 0,

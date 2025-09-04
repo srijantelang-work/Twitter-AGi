@@ -1,3 +1,5 @@
+import { TweetData, TwitterUser } from '@/lib/twitter/twitter-api'
+
 interface CachedTweet {
   id: string
   text: string
@@ -59,13 +61,13 @@ export class TwitterCacheService {
   /**
    * Store search results in cache
    */
-  cacheResult(keywords: string[], searchQuery: string, tweets: any[], includes?: any): void {
+  cacheResult(keywords: string[], searchQuery: string, tweets: TweetData[], includes?: { users?: TwitterUser[] }): void {
     const cacheKey = this.generateCacheKey(keywords, searchQuery)
     const now = Date.now()
 
     // Transform tweets to include author information
     const transformedTweets: CachedTweet[] = tweets.map(tweet => {
-      const author = includes?.users?.find((u: any) => u.id === tweet.author_id)
+      const author = includes?.users?.find((u: TwitterUser) => u.id === tweet.author_id)
       return {
         ...tweet,
         author_username: author?.username || 'unknown',

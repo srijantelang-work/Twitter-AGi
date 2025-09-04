@@ -1,6 +1,6 @@
 import { systemLogger } from '@/lib/logging/system-logger'
 import { TwitterCacheService } from '@/lib/cache/twitter-cache'
-import { TwitterRateLimiter } from '@/lib/rate-limit/twitter-rate-limiter'
+import { TwitterRateLimiter, RateLimitInfo } from '@/lib/rate-limit/twitter-rate-limiter'
 
 export interface TwitterCredentials {
   apiKey: string
@@ -130,7 +130,6 @@ export class TwitterAPIService {
 
     // Check rate limits
     if (this.rateLimiter.isRateLimited(endpoint)) {
-      const retryDelay = this.rateLimiter.getRetryDelay(endpoint)
       const message = this.rateLimiter.getRateLimitMessage(endpoint)
       
       await systemLogger.warn('Twitter API', `Rate limited for ${endpoint}: ${message}`)
@@ -447,7 +446,7 @@ export class TwitterAPIService {
   /**
    * Get current rate limit status
    */
-  getRateLimitStatus(): Record<string, any> {
+  getRateLimitStatus(): Record<string, RateLimitInfo> {
     return this.rateLimiter.getRateLimitStatus()
   }
 

@@ -38,7 +38,12 @@ export interface ContentPostingResult {
   success: boolean
   twitterPostId?: string
   errorMessage?: string
-  engagementMetrics?: any
+  engagementMetrics?: {
+    likes: number
+    retweets: number
+    replies: number
+    impressions: number
+  }
 }
 
 export class ContentQueueManager {
@@ -345,7 +350,23 @@ export class ContentQueueManager {
   /**
    * Map database data to ContentQueueItem interface
    */
-  private mapQueueItem(data: any): ContentQueueItem {
+  private mapQueueItem(data: {
+    id: string
+    user_id: string
+    content_type: string
+    content: string
+    hashtags?: string[]
+    emojis?: string[]
+    confidence_score: number
+    scheduled_at?: string
+    created_at: string
+    updated_at: string
+    content_approval?: Array<{
+      status: 'pending' | 'approved' | 'rejected' | 'requires_changes'
+      approver_id?: string
+      feedback?: string
+    }>
+  }): ContentQueueItem {
     return {
       id: data.id,
       contentId: data.id,

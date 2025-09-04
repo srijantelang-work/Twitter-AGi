@@ -231,7 +231,7 @@ export class ContentCalendarSystem {
     errorMessage?: string
   ): Promise<void> {
     try {
-      const updateData: any = { status }
+      const updateData: { status: string; posted_at?: string; error_message?: string; retry_count?: number } = { status }
       
       if (status === 'posted') {
         updateData.posted_at = new Date().toISOString()
@@ -308,7 +308,7 @@ export class ContentCalendarSystem {
     timeSlot: string,
     dayOfWeek: number,
     contentType: string,
-    engagementPatterns: any
+    engagementPatterns: Record<string, number>
   ): number {
     let score = 0.5 // Base score
 
@@ -380,7 +380,20 @@ export class ContentCalendarSystem {
   /**
    * Map database data to ContentSchedule interface
    */
-  private mapScheduleData(data: any): ContentSchedule {
+  private mapScheduleData(data: {
+    id: string
+    content_id: string
+    user_id: string
+    scheduled_at: string
+    posting_time_slot: string
+    timezone: string
+    status: string
+    retry_count: number
+    max_retries: number
+    error_message?: string
+    created_at: string
+    updated_at: string
+  }): ContentSchedule {
     return {
       id: data.id,
       contentId: data.content_id,

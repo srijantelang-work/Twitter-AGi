@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 
 interface StatsData {
   totalTweets: number;
@@ -30,7 +30,7 @@ interface Content {
 
 export function useStats(): UseStatsReturn {
   const [stats, setStats] = useState<StatsData | null>(null);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(false); // Changed from true to false
   const [error, setError] = useState<string | null>(null);
 
   const fetchStats = async () => {
@@ -39,28 +39,25 @@ export function useStats(): UseStatsReturn {
       setError(null);
       
       // Fetch stats from multiple endpoints and combine them
-      const [tweetsResponse, responsesResponse, contentResponse] = await Promise.all([
-        fetch('/api/twitter/search-live', { method: 'POST', headers: { 'Content-Type': 'application/json' } }),
+      const [responsesResponse, contentResponse] = await Promise.all([
         fetch('/api/ai/responses'),
         fetch('/api/content/schedule')
       ]);
 
-      if (!tweetsResponse.ok || !responsesResponse.ok || !contentResponse.ok) {
+      if (!responsesResponse.ok || !contentResponse.ok) {
         throw new Error('Failed to fetch stats data');
       }
 
-      const [tweetsData, responsesData, contentData] = await Promise.all([
-        tweetsResponse.json(),
+      const [responsesData, contentData] = await Promise.all([
         responsesResponse.json(),
         contentResponse.json()
       ]);
 
-      const tweets = tweetsData.tweets || [];
       const responses = responsesData.responses || [];
       const content = contentData.content || [];
 
-      // Calculate statistics
-      const totalTweets = tweets.length;
+      // Calculate statistics without Twitter API calls
+      const totalTweets = 0; // Will be updated when user manually refreshes
       const totalResponses = responses.length;
       const pendingResponses = responses.filter((r: Response) => r.status === 'pending').length;
       const approvedResponses = responses.filter((r: Response) => r.status === 'approved').length;
@@ -94,9 +91,10 @@ export function useStats(): UseStatsReturn {
     }
   };
 
-  useEffect(() => {
-    fetchStats();
-  }, []);
+  // Remove automatic fetch on mount - users must manually refresh
+  // useEffect(() => {
+  //   fetchStats();
+  // }, []);
 
   return {
     stats,
