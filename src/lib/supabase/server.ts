@@ -1,14 +1,8 @@
 import { createServerClient } from '@supabase/ssr'
 
-// Create a more robust server client that handles build-time issues
 export async function createClient() {
-  // Check if we're in a build environment
-  if (typeof window === 'undefined' && !process.env.NEXT_PUBLIC_SUPABASE_URL) {
-    throw new Error('Supabase environment variables not configured')
-  }
-
   try {
-    // Dynamic import to avoid build-time issues in Vercel
+    // Dynamic import to avoid build-time issues
     const { cookies } = await import('next/headers')
     const cookieStore = await cookies()
 
@@ -35,37 +29,20 @@ export async function createClient() {
       }
     )
   } catch (error) {
-    // If we can't create the client (e.g., during build), return a mock
+    // For build-time compatibility, return a mock client
     // This will be replaced at runtime
     console.warn('Failed to create Supabase server client:', error)
     
+    // Return a mock client that throws on usage
     return {
       auth: {
         getUser: async () => {
-          throw new Error('Supabase client not properly initialized - this is expected during build time')
+          throw new Error('Supabase client not properly initialized')
         }
-      },
-      from: () => ({
-        select: () => ({
-          eq: () => ({
-            single: async () => {
-              throw new Error('Supabase client not properly initialized - this is expected during build time')
-            }
-          }),
-          update: () => ({
-            eq: () => ({
-              select: () => ({
-                single: async () => {
-                  throw new Error('Supabase client not properly initialized - this is expected during build time')
-                }
-              })
-            })
-          })
-        })
-      })
+      }
     } as ReturnType<typeof createServerClient>
   }
 }
 
-// Export a type-safe version
+// Export a type-safe version for build-time compatibility
 export type SupabaseServerClient = Awaited<ReturnType<typeof createClient>>
