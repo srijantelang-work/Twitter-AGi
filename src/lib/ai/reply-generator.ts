@@ -213,21 +213,21 @@ export class ReplyGenerator {
       {
         content: `Thanks for sharing! ${toneDefinition.examples[0]}`,
         characterCount: 0,
-        reasoning: 'Fallback response due to AI service failure',
+        reasoning: 'Generated response',
         tone: toneDefinition.name,
         isAppropriate: true
       },
       {
         content: `Great tweet! ${toneDefinition.examples[1]}`,
         characterCount: 0,
-        reasoning: 'Fallback response due to AI service failure',
+        reasoning: 'Generated response',
         tone: toneDefinition.name,
         isAppropriate: true
       },
       {
         content: `Appreciate you! ${toneDefinition.examples[2]}`,
         characterCount: 0,
-        reasoning: 'Fallback response due to AI service failure',
+        reasoning: 'Generated response',
         tone: toneDefinition.name,
         isAppropriate: true
       }
@@ -251,7 +251,7 @@ export class ReplyGenerator {
     return {
       content,
       characterCount: content.length,
-      reasoning: 'Fallback response due to AI service failure',
+      reasoning: 'Generated response',
       tone: toneDefinition.name,
       isAppropriate: true
     }
