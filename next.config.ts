@@ -16,6 +16,13 @@ const nextConfig: NextConfig = {
         tls: false,
       };
     }
+    
+    // Ensure proper module resolution
+    config.resolve.alias = {
+      ...config.resolve.alias,
+      '@': require('path').resolve(__dirname, 'src'),
+    };
+    
     return config;
   },
   // Environment-specific configurations

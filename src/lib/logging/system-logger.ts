@@ -200,10 +200,10 @@ export class SystemLogger {
 
       const stats = {
         total: data?.length || 0,
-        debug: data?.filter(l => l.level === 'debug').length || 0,
-        info: data?.filter(l => l.level === 'info').length || 0,
-        warn: data?.filter(l => l.level === 'warn').length || 0,
-        error: data?.filter(l => l.level === 'error').length || 0,
+        debug: data?.filter((l: { level: string }) => l.level === 'debug').length || 0,
+        info: data?.filter((l: { level: string }) => l.level === 'info').length || 0,
+        warn: data?.filter((l: { level: string }) => l.level === 'warn').length || 0,
+        error: data?.filter((l: { level: string }) => l.level === 'error').length || 0,
       }
 
       return stats

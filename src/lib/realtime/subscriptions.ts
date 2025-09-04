@@ -7,10 +7,21 @@ type RealtimePayload = {
 }
 
 export class RealtimeService {
-  private supabase = createClient()
+  private supabase: ReturnType<typeof createClient> | null = null
   private subscriptions: Map<string, unknown> = new Map()
   private eventSource: EventSource | null = null
   private isStreaming = false
+
+  constructor() {
+    // Only initialize Supabase client in browser environment
+    if (typeof window !== 'undefined') {
+      try {
+        this.supabase = createClient()
+      } catch (error) {
+        console.warn('Failed to initialize Supabase client:', error)
+      }
+    }
+  }
 
   /**
    * Subscribe to monitored tweets changes
@@ -19,24 +30,34 @@ export class RealtimeService {
     callback: (payload: RealtimePayload) => void,
     filters?: { status?: string; author_id?: string }
   ): string {
-    const channel = this.supabase
-      .channel('monitored_tweets_changes')
-      .on(
-        'postgres_changes',
-        {
-          event: '*',
-          schema: 'public',
-          table: 'monitored_tweets',
-          filter: filters?.status ? `status=eq.${filters.status}` : undefined
-        },
-        callback
-      )
-      .subscribe()
+    if (!this.supabase) {
+      console.warn('Supabase client not available')
+      return 'no_client'
+    }
 
-    const id = `tweets_${Date.now()}`
-    this.subscriptions.set(id, channel)
+    try {
+      const channel = this.supabase
+        .channel('monitored_tweets_changes')
+        .on(
+          'postgres_changes',
+          {
+            event: '*',
+            schema: 'public',
+            table: 'monitored_tweets',
+            filter: filters?.status ? `status=eq.${filters.status}` : undefined
+          },
+          callback
+        )
+        .subscribe()
 
-    return id
+      const id = `tweets_${Date.now()}`
+      this.subscriptions.set(id, channel)
+
+      return id
+    } catch (error) {
+      console.error('Failed to subscribe to tweets:', error)
+      return 'error'
+    }
   }
 
   /**
@@ -73,26 +94,33 @@ export class RealtimeService {
     })
 
     // Also subscribe to Supabase real-time changes for immediate updates
-    const channel = this.supabase
-      .channel(`live_monitoring_${streamId}`)
-      .on(
-        'postgres_changes',
-        {
-          event: '*',
-          schema: 'public',
-          table: 'monitored_tweets'
-        },
-        (payload) => {
-          callback({
-            type: 'realtime_update',
-            data: payload,
-            timestamp: new Date().toISOString()
-          })
-        }
-      )
-      .subscribe()
+    if (this.supabase) {
+      try {
+        const channel = this.supabase
+          .channel(`live_monitoring_${streamId}`)
+          .on(
+            'postgres_changes',
+            {
+              event: '*',
+              schema: 'public',
+              table: 'monitored_tweets'
+            },
+            (payload) => {
+              callback({
+                type: 'realtime_update',
+                data: payload,
+                timestamp: new Date().toISOString()
+              })
+            }
+          )
+          .subscribe()
 
-    this.subscriptions.set(streamId, channel)
+        this.subscriptions.set(streamId, channel)
+      } catch (error) {
+        console.error('Failed to subscribe to live monitoring:', error)
+      }
+    }
+    
     this.isStreaming = true
 
     return streamId
@@ -132,24 +160,34 @@ export class RealtimeService {
     callback: (payload: RealtimePayload) => void,
     filters?: { status?: string; created_by?: string }
   ): string {
-    const channel = this.supabase
-      .channel('agent_responses_changes')
-      .on(
-        'postgres_changes',
-        {
-          event: '*',
-          schema: 'public',
-          table: 'agent_responses',
-          filter: filters?.status ? `status=eq.${filters.status}` : undefined
-        },
-        callback
-      )
-      .subscribe()
+    if (!this.supabase) {
+      console.warn('Supabase client not available')
+      return 'no_client'
+    }
 
-    const id = `responses_${Date.now()}`
-    this.subscriptions.set(id, channel)
+    try {
+      const channel = this.supabase
+        .channel('agent_responses_changes')
+        .on(
+          'postgres_changes',
+          {
+            event: '*',
+            schema: 'public',
+            table: 'agent_responses',
+            filter: filters?.status ? `status=eq.${filters.status}` : undefined
+          },
+          callback
+        )
+        .subscribe()
 
-    return id
+      const id = `responses_${Date.now()}`
+      this.subscriptions.set(id, channel)
+
+      return id
+    } catch (error) {
+      console.error('Failed to subscribe to responses:', error)
+      return 'error'
+    }
   }
 
   /**
@@ -159,24 +197,34 @@ export class RealtimeService {
     callback: (payload: RealtimePayload) => void,
     filters?: { status?: string; created_by?: string }
   ): string {
-    const channel = this.supabase
-      .channel('content_schedule_changes')
-      .on(
-        'postgres_changes',
-        {
-          event: '*',
-          schema: 'public',
-          table: 'content_schedule',
-          filter: filters?.status ? `status=eq.${filters.status}` : undefined
-        },
-        callback
-      )
-      .subscribe()
+    if (!this.supabase) {
+      console.warn('Supabase client not available')
+      return 'no_client'
+    }
 
-    const id = `content_${Date.now()}`
-    this.subscriptions.set(id, channel)
+    try {
+      const channel = this.supabase
+        .channel('content_schedule_changes')
+        .on(
+          'postgres_changes',
+          {
+            event: '*',
+            schema: 'public',
+            table: 'content_schedule',
+            filter: filters?.status ? `status=eq.${filters.status}` : undefined
+          },
+          callback
+        )
+        .subscribe()
 
-    return id
+      const id = `content_${Date.now()}`
+      this.subscriptions.set(id, channel)
+
+      return id
+    } catch (error) {
+      console.error('Failed to subscribe to content:', error)
+      return 'error'
+    }
   }
 
   /**
@@ -186,24 +234,34 @@ export class RealtimeService {
     callback: (payload: RealtimePayload) => void,
     filters?: { level?: string; category?: string }
   ): string {
-    const channel = this.supabase
-      .channel('system_logs_changes')
-      .on(
-        'postgres_changes',
-        {
-          event: '*',
-          schema: 'public',
-          table: 'system_logs',
-          filter: filters?.level ? `level=eq.${filters.level}` : undefined
-        },
-        callback
-      )
-      .subscribe()
+    if (!this.supabase) {
+      console.warn('Supabase client not available')
+      return 'no_client'
+    }
 
-    const id = `logs_${Date.now()}`
-    this.subscriptions.set(id, channel)
+    try {
+      const channel = this.supabase
+        .channel('system_logs_changes')
+        .on(
+          'postgres_changes',
+          {
+            event: '*',
+            schema: 'public',
+            table: 'system_logs',
+            filter: filters?.level ? `level=eq.${filters.level}` : undefined
+          },
+          callback
+        )
+        .subscribe()
 
-    return id
+      const id = `logs_${Date.now()}`
+      this.subscriptions.set(id, channel)
+
+      return id
+    } catch (error) {
+      console.error('Failed to subscribe to logs:', error)
+      return 'error'
+    }
   }
 
   /**
@@ -212,9 +270,14 @@ export class RealtimeService {
   unsubscribe(subscriptionId: string): boolean {
     const channel = this.subscriptions.get(subscriptionId) as { unsubscribe: () => void } | undefined
     if (channel) {
-      channel.unsubscribe()
-      this.subscriptions.delete(subscriptionId)
-      return true
+      try {
+        channel.unsubscribe()
+        this.subscriptions.delete(subscriptionId)
+        return true
+      } catch (error) {
+        console.error('Failed to unsubscribe:', error)
+        return false
+      }
     }
     return false
   }
@@ -224,7 +287,11 @@ export class RealtimeService {
    */
   unsubscribeAll(): void {
     this.subscriptions.forEach((channel) => {
-      (channel as { unsubscribe: () => void }).unsubscribe()
+      try {
+        (channel as { unsubscribe: () => void }).unsubscribe()
+      } catch (error) {
+        console.error('Failed to unsubscribe from channel:', error)
+      }
     })
     this.subscriptions.clear()
   }

@@ -31,6 +31,13 @@ export function useRealtimeUpdates(): UseRealtimeUpdatesReturn {
           callback(payload.new as unknown as TweetData);
         }
       });
+      
+      if (subscriptionId === 'no_client' || subscriptionId === 'error') {
+        setError('Failed to subscribe to tweets - service not available');
+        setIsConnected(false);
+        return () => {}; // Return empty unsubscribe function
+      }
+      
       setIsConnected(true);
       setError(null);
       return () => realtimeService.unsubscribe(subscriptionId);
@@ -48,6 +55,13 @@ export function useRealtimeUpdates(): UseRealtimeUpdatesReturn {
           callback(payload.new as unknown as AIResponse);
         }
       });
+      
+      if (subscriptionId === 'no_client' || subscriptionId === 'error') {
+        setError('Failed to subscribe to responses - service not available');
+        setIsConnected(false);
+        return () => {}; // Return empty unsubscribe function
+      }
+      
       setIsConnected(true);
       setError(null);
       return () => realtimeService.unsubscribe(subscriptionId);
@@ -65,6 +79,13 @@ export function useRealtimeUpdates(): UseRealtimeUpdatesReturn {
           callback(payload.new as unknown as ContentSchedule);
         }
       });
+      
+      if (subscriptionId === 'no_client' || subscriptionId === 'error') {
+        setError('Failed to subscribe to content - service not available');
+        setIsConnected(false);
+        return () => {}; // Return empty unsubscribe function
+      }
+      
       setIsConnected(true);
       setError(null);
       return () => realtimeService.unsubscribe(subscriptionId);
@@ -76,6 +97,9 @@ export function useRealtimeUpdates(): UseRealtimeUpdatesReturn {
   }, []);
 
   useEffect(() => {
+    // Only run in browser environment
+    if (typeof window === 'undefined') return;
+    
     // Initialize connection status based on active subscriptions
     setIsConnected(realtimeService.getActiveSubscriptionCount() > 0);
     
