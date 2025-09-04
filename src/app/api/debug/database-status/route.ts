@@ -6,7 +6,7 @@ export async function GET() {
     const supabase = await createClient()
     
     // Check if we can connect to Supabase
-    const { data: { session }, error: sessionError } = await supabase.auth.getSession()
+    const { error: sessionError } = await supabase.auth.getSession()
     
     const status = {
       timestamp: new Date().toISOString(),
@@ -30,12 +30,12 @@ export async function GET() {
     for (const tableName of tablesToCheck) {
       try {
         // Try to query the table (just count rows)
-        const { count, error } = await supabase
+        const { error } = await supabase
           .from(tableName)
           .select('*', { count: 'exact', head: true })
         
         status.tables[tableName] = !error
-      } catch (error) {
+      } catch {
         status.tables[tableName] = false
       }
     }
@@ -45,7 +45,7 @@ export async function GET() {
       status.recommendations.push('❌ Check Supabase connection and environment variables')
     }
 
-    const missingTables = Object.entries(status.tables).filter(([_, exists]) => !exists)
+    const missingTables = Object.entries(status.tables).filter(([, exists]) => !exists)
     if (missingTables.length > 0) {
       status.recommendations.push(`❌ Missing tables: ${missingTables.map(([name]) => name).join(', ')}`)
       status.recommendations.push('💡 Run database initialization or check migrations')

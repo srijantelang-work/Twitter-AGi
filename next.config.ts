@@ -4,7 +4,6 @@ const nextConfig: NextConfig = {
   /* config options here */
   experimental: {
     // Enable experimental features for better development experience
-    serverComponentsExternalPackages: ['@supabase/supabase-js']
   },
   // Handle SSL issues in development
   webpack: (config, { dev, isServer }) => {

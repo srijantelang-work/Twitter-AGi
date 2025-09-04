@@ -1,18 +1,29 @@
 import { NextRequest, NextResponse } from 'next/server'
+import { createClient } from '@/lib/supabase/server'
 import { ContentAnalyticsService } from '@/lib/analytics/content-analytics'
 import { systemLogger } from '@/lib/logging/system-logger'
 
 export async function GET(request: NextRequest) {
   try {
+    const supabase = await createClient()
+    
+    // Check authentication
+    const { data: { user }, error: authError } = await supabase.auth.getUser()
+    if (authError || !user) {
+      return NextResponse.json(
+        { error: 'Unauthorized' },
+        { status: 401 }
+      )
+    }
+
     const { searchParams } = new URL(request.url)
-    const userId = searchParams.get('userId') || 'current'
     const days = parseInt(searchParams.get('days') || '30')
 
     const analyticsService = new ContentAnalyticsService()
-    const analytics = await analyticsService.getUserContentAnalytics(userId, days)
+    const analytics = await analyticsService.getUserContentAnalytics(user.id, days)
 
     await systemLogger.info('Analytics API', 'Content analytics retrieved', {
-      userId,
+      userId: user.id,
       days,
       totalContent: analytics.totalContent
     })

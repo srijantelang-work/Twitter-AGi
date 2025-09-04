@@ -84,7 +84,7 @@ export async function POST(request: NextRequest) {
     const supabase = await createClient()
     const body = await request.json()
     
-    const { tweet_id, monitored_tweet_id, response_type, content, ai_generated, confidence_score, status, scheduled_at } = body
+    const { tweet_id, response_type, content, ai_generated, confidence_score, status } = body
 
     // Validate required fields
     if (!tweet_id || !response_type || !content) {

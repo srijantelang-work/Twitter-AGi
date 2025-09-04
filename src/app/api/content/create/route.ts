@@ -5,7 +5,7 @@ import { systemLogger } from '@/lib/logging/system-logger'
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json()
-    const { content, contentType, hashtags, emojis, scheduledAt, postingTimeSlot } = body
+    const { content, contentType, hashtags, emojis } = body
 
     if (!content || !contentType) {
       return NextResponse.json(

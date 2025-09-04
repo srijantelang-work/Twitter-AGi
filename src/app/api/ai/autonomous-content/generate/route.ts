@@ -18,6 +18,7 @@ export async function POST(request: NextRequest) {
 
     // Validate content type
     const validContentTypes = [
+      'varied',
       'networking_tips',
       'ai_insights', 
       'startup_humor',
@@ -55,7 +56,7 @@ export async function POST(request: NextRequest) {
     } else {
       // Generate specific content type
       content = await groqService.generateSuperconnectorContent({
-        contentType: contentType as any,
+        contentType: contentType as 'networking_tips' | 'ai_insights' | 'startup_humor' | 'community_building' | 'connection_stories' | 'tech_trends',
         context: context || `Generate ${contentType} content for the AI Superconnector brand`,
         includeEngagementPrompt: includeEngagementPrompt || false,
         includeFollowUp: includeFollowUp || false
@@ -65,7 +66,7 @@ export async function POST(request: NextRequest) {
     await systemLogger.info('AI API', 'Content generated successfully', {
       contentType,
       confidence: content.confidence,
-      length: content.length
+      length: content.content?.length || 0
     })
 
     return NextResponse.json({
@@ -118,7 +119,7 @@ export async function GET(request: NextRequest) {
       for (let i = 0; i < limit; i++) {
         try {
           const content = await groqService.generateSuperconnectorContent({
-            contentType: contentType as any,
+            contentType: contentType as 'networking_tips' | 'ai_insights' | 'startup_humor' | 'community_building' | 'connection_stories' | 'tech_trends',
             context: `Content suggestion ${i + 1} for ${contentType}`,
             includeEngagementPrompt: true
           })

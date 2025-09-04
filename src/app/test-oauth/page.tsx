@@ -6,9 +6,60 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
 import { Twitter, RefreshCw, CheckCircle, XCircle } from 'lucide-react'
 
+interface AuthStatus {
+  authenticated: boolean
+  user?: {
+    id: string
+    email: string
+    emailVerified: boolean
+    provider: string
+    twitterUsername?: string
+    twitterUserId?: string
+    createdAt: string
+    lastSignIn: string
+  }
+  session?: {
+    accessToken: string | null
+    refreshToken: string | null
+    expiresAt: number
+  }
+  error?: string
+  message?: string
+}
+
+interface OAuthConfig {
+  timestamp: string
+  environment: string
+  configuration: {
+    supabase: {
+      configured: boolean
+      url: string
+      anonKey: string
+    }
+    twitter: {
+      oauth: {
+        configured: boolean
+        clientId: string
+        clientSecret: string
+      }
+      api: {
+        apiKey: string
+        apiSecret: string
+        bearerToken: string
+      }
+      callbackUrl: string
+    }
+  }
+  recommendations: {
+    supabase: string
+    twitterOAuth: string
+    twitterAPI: string
+  }
+}
+
 export default function TestOAuthPage() {
-  const [authStatus, setAuthStatus] = useState<any>(null)
-  const [oauthConfig, setOauthConfig] = useState<any>(null)
+  const [authStatus, setAuthStatus] = useState<AuthStatus | null>(null)
+  const [oauthConfig, setOauthConfig] = useState<OAuthConfig | null>(null)
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
 
@@ -50,7 +101,7 @@ export default function TestOAuthPage() {
       setError(null)
       
       // Redirect to login page to test OAuth
-      window.location.href = '/login'
+      window.location.href = '/'
     } catch (err) {
       setError('Failed to test Twitter OAuth')
       console.error('Twitter OAuth test error:', err)

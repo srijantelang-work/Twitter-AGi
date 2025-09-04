@@ -34,27 +34,7 @@ export async function middleware(request: NextRequest) {
     return supabaseResponse
   }
 
-  // FIXED: Skip middleware for login page if user is already authenticated
-  if (pathname === '/login') {
-    try {
-      const { data: { user } } = await supabase.auth.getUser()
-      
-      if (user) {
-        // User is already authenticated, redirect to dashboard to prevent loops
-        console.log('Middleware: User already authenticated, redirecting to dashboard', { 
-          userId: user.id, 
-          email: user.email 
-        })
-        const redirectUrl = new URL('/dashboard', request.url)
-        return NextResponse.redirect(redirectUrl)
-      }
-    } catch (error) {
-      console.error('Auth error in middleware for login page:', error)
-      // Continue to login page if there's an error
-    }
-    
-    return supabaseResponse
-  }
+
 
   if (isProtectedRoute) {
     try {
@@ -62,7 +42,7 @@ export async function middleware(request: NextRequest) {
       
       if (!user) {
         console.log('Middleware: Unauthenticated user accessing protected route', { pathname })
-        const redirectUrl = new URL('/login', request.url)
+        const redirectUrl = new URL('/', request.url)
         return NextResponse.redirect(redirectUrl)
       }
       
@@ -76,7 +56,7 @@ export async function middleware(request: NextRequest) {
       
     } catch (error) {
       console.error('Auth error in middleware:', error)
-      const redirectUrl = new URL('/login', request.url)
+      const redirectUrl = new URL('/', request.url)
       return NextResponse.redirect(redirectUrl)
     }
   }

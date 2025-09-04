@@ -22,7 +22,7 @@ export async function GET() {
       message: 'Rate limit status endpoint',
       timestamp: new Date().toISOString()
     })
-  } catch (error) {
+  } catch {
     return NextResponse.json({ error: 'Failed to get rate limit status' }, { status: 500 })
   }
 }

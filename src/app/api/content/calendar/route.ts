@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { ContentCalendarSystem } from '@/lib/content/calendar-system'
 import { ContentQueueManager } from '@/lib/content/queue-manager'
 import { systemLogger } from '@/lib/logging/system-logger'
+import { createClient } from '@/lib/supabase/server'
 
 export async function POST(request: NextRequest) {
   try {
@@ -71,28 +72,31 @@ export async function POST(request: NextRequest) {
 
 export async function GET(request: NextRequest) {
   try {
-    const { searchParams } = new URL(request.url)
-    const userId = searchParams.get('userId')
-    const status = searchParams.get('status')
-    const days = parseInt(searchParams.get('days') || '7')
-
-    if (!userId) {
+    const supabase = await createClient()
+    
+    // Check authentication
+    const { data: { user }, error: authError } = await supabase.auth.getUser()
+    if (authError || !user) {
       return NextResponse.json(
-        { error: 'User ID is required' },
-        { status: 400 }
+        { error: 'Unauthorized' },
+        { status: 401 }
       )
     }
 
+    const { searchParams } = new URL(request.url)
+    const status = searchParams.get('status')
+    const days = parseInt(searchParams.get('days') || '7')
+
     const calendarSystem = new ContentCalendarSystem()
 
-    // Get scheduled content
-    const scheduledContent = await calendarSystem.getScheduledContent(userId, status || undefined)
+    // Get scheduled content for authenticated user
+    const scheduledContent = await calendarSystem.getScheduledContent(user.id, status || undefined)
 
-    // Get content variety distribution
-    const varietyDistribution = await calendarSystem.getContentVarietyDistribution(userId, days)
+    // Get content variety distribution for authenticated user
+    const varietyDistribution = await calendarSystem.getContentVarietyDistribution(user.id, days)
 
     await systemLogger.info('Content API', 'Calendar data retrieved', {
-      userId,
+      userId: user.id,
       contentCount: scheduledContent.length,
       days
     })

@@ -19,14 +19,14 @@ export async function GET(request: NextRequest) {
     // Handle OAuth errors
     if (error) {
       console.error('OAuth Callback: OAuth error received', { error, errorDescription })
-      const errorUrl = `/login?error=oauth_${error}&details=${encodeURIComponent(errorDescription || 'Unknown OAuth error')}`
+              const errorUrl = `/?error=oauth_${error}&details=${encodeURIComponent(errorDescription || 'Unknown OAuth error')}`
       return NextResponse.redirect(new URL(errorUrl, request.url))
     }
 
     // Handle missing authorization code
     if (!code) {
       console.error('OAuth Callback: No authorization code received')
-      return NextResponse.redirect(new URL('/login?error=oauth_no_code', request.url))
+              return NextResponse.redirect(new URL('/?error=oauth_no_code', request.url))
     }
 
     // Exchange code for session
@@ -35,13 +35,13 @@ export async function GET(request: NextRequest) {
 
     if (exchangeError) {
       console.error('OAuth Callback: Failed to exchange code for session', exchangeError)
-      const errorUrl = `/login?error=oauth_exchange_failed&details=${encodeURIComponent(exchangeError.message)}`
+              const errorUrl = `/?error=oauth_exchange_failed&details=${encodeURIComponent(exchangeError.message)}`
       return NextResponse.redirect(new URL(errorUrl, request.url))
     }
 
     if (!data.session) {
       console.error('OAuth Callback: No session returned after code exchange')
-      return NextResponse.redirect(new URL('/login?error=oauth_no_session', request.url))
+              return NextResponse.redirect(new URL('/?error=oauth_no_session', request.url))
     }
 
     // Handle Twitter users who don't have email addresses
@@ -99,7 +99,7 @@ export async function GET(request: NextRequest) {
 
   } catch (error) {
     console.error('OAuth Callback: Unexpected error', error)
-    const errorUrl = `/login?error=oauth_callback_error&details=${encodeURIComponent('Unexpected error during OAuth callback')}`
+            const errorUrl = `/?error=oauth_callback_error&details=${encodeURIComponent('Unexpected error during OAuth callback')}`
     return NextResponse.redirect(new URL(errorUrl, request.url))
   }
 }

@@ -23,7 +23,7 @@ export default function AuthCodeError() {
               Please try signing in again or contact support if the problem persists.
             </p>
             <Link
-              href="/login"
+              href="/"
               className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded-md text-sm font-medium"
             >
               Try Again
